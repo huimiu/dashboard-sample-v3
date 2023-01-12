@@ -15,27 +15,27 @@
 4. Press `F5` to open a browser window.
 5. The first time you run this sample, you need to login to consent some delegated permissions. After login, you may need to restart the sample. If you don't see the consent page, please check if your browser blocks the pop-up window.
 
-   <img src="tabs\public\popup-block.png">
+   <img src="public\popup-block.png">
 
 > If prompted that you cannot authorize access to calendar, tasks and files, please use onmicrosoft's M365 account.
 
 # Try the sample
 
-   <img src="tabs\public\dashboard.png">
+   <img src="public\dashboard.png">
 
 1. You can see several widgets in the dashboard, some show data charts and others show informations with interactive buttons.
 2. In the `Area chart` widget, you can see selling data curves and a table with some informations, like features names, owners, priorities, and processing states.
 3. In the `Teams Collaboration` widget, you can see some news with pictures and words to help you quickly obtain the most recent news.
 4. In the `Your upcoming events` widget, you can see the upcoming events on your calendar. And you can click the `Join` button to join a meeting.
 
-   <img src="tabs\public\join-meeting.png" style="zoom: 50%">
+   <img src="public\join-meeting.png" style="zoom: 50%">
 
 5. In the `Your Tasks` widget, you can see your tasks list. You can click and enter a task name to add a new task. After you successfully add a task, you will receive a notification.
 
-   <img src="tabs\public\add-task.png" style="zoom: 50%">
+   <img src="public\add-task.png" style="zoom: 50%">
 
-   <img src="tabs\public\task-notification.png" style="zoom: 30%">
+   <img src="public\task-notification.png" style="zoom: 30%">
 
 6. In the `Your Documents` widget, you can see your documents. You can click one to open it. You can also click the `...` button on the right to choose the way to open the file, download the file or copy the file link.
 
-   <img src="tabs\public\document.png" style="zoom: 50%">
+   <img src="public\document.png" style="zoom: 50%">
