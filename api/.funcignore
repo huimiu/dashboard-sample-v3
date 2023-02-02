@@ -1,7 +1,12 @@
 *.js.map
 *.ts
 .git*
+.localSettings
 .vscode
 local.settings.json
 test
-getting_started.md
+tsconfig.json
+.DS_Store
+.deployment
+node_modules/.bin
+node_modules/azure-functions-core-tools
