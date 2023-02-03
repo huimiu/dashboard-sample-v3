@@ -1,6 +1,10 @@
-import React, { CSSProperties } from "react";
+import "../styles/Common.css";
+import "../styles/Task.css";
 
-import { Button, Checkbox, Image, Text } from "@fluentui/react-components";
+import React from "react";
+
+import { mergeStyles } from "@fluentui/react";
+import { Button, Checkbox, Image, Spinner, Text } from "@fluentui/react-components";
 import {
   Add20Filled,
   ArrowRight16Filled,
@@ -15,20 +19,10 @@ import { callFunction } from "../../services/callFunction";
 import { addTask, getTasks } from "../../services/taskService";
 import { EmptyThemeImg } from "../components/EmptyThemeImg";
 import { Widget } from "../lib/Widget";
-import { footerBtnStyle, headerContentStyle, headerTextStyle } from "../lib/Widget.styles";
-import { emptyLayout, emptyTextStyle, widgetPaddingStyle } from "../styles/Common.styles";
-import {
-  addBtnStyle,
-  addTaskBtnStyle,
-  addTaskContainer,
-  bodyLayout,
-  existingTaskLayout,
-  inputStyle,
-} from "../styles/Task.styles";
+import { widgetStyle } from "../lib/Widget.styles";
 
 interface ITaskState {
   tasks?: TaskModel[];
-  loading: boolean;
   inputFocused?: boolean;
   addBtnOver?: boolean;
 }
@@ -51,13 +45,12 @@ export class Task extends Widget<ITaskState> {
       tasks: await getTasks(),
       inputFocused: false,
       addBtnOver: false,
-      loading: false,
     };
   }
 
-  headerContent(): JSX.Element | undefined {
+  protected headerContent(): JSX.Element | undefined {
     return (
-      <div style={headerContentStyle}>
+      <div className={widgetStyle.headerContent}>
         <TeamsFxContext.Consumer>
           {({ themeString }) =>
             themeString === "default" ? (
@@ -67,7 +60,7 @@ export class Task extends Widget<ITaskState> {
             )
           }
         </TeamsFxContext.Consumer>
-        <Text key="text-task-title" style={headerTextStyle}>
+        <Text key="text-task-title" className={widgetStyle.headerText}>
           Your tasks
         </Text>
         <Button key="bt-task-more" icon={<MoreHorizontal32Regular />} appearance="transparent" />
@@ -75,22 +68,25 @@ export class Task extends Widget<ITaskState> {
     );
   }
 
-  bodyContent(): JSX.Element | undefined {
-    const loading: boolean = !this.state.data || (this.state.data.loading ?? true);
-    const hasTask = this.state.data?.tasks?.length !== 0;
+  protected bodyContent(): JSX.Element | undefined {
+    const hasTask = this.state.tasks?.length !== 0;
     return (
-      <div style={bodyLayout(hasTask)}>
+      <div className={hasTask ? "has-task-layout" : "no-task-layout"}>
         <TeamsFxContext.Consumer>
           {({ themeString }) => this.inputLayout(themeString)}
         </TeamsFxContext.Consumer>
-        {loading ? (
-          <></>
-        ) : hasTask ? (
-          this.state.data?.tasks?.map((item: TaskModel) => {
+        {hasTask ? (
+          this.state.tasks?.map((item: TaskModel) => {
             return (
               <TeamsFxContext.Consumer key={`consumer-task-${item.id}`}>
                 {({ themeString }) => (
-                  <div key={`div-task-${item.id}`} style={existingTaskLayout(themeString)}>
+                  <div
+                    key={`div-task-${item.id}`}
+                    className={mergeStyles(
+                      "existing-task-layout",
+                      themeString === "contrast" ? "border-style" : ""
+                    )}
+                  >
                     <Checkbox key={`cb-task-${item.id}`} shape="circular" label={item.name} />
                     <Button
                       key={`bt-task-${item.id}`}
@@ -103,9 +99,9 @@ export class Task extends Widget<ITaskState> {
             );
           })
         ) : (
-          <div style={emptyLayout}>
+          <div>
             <EmptyThemeImg key="img-empty" />
-            <Text key="text-empty" weight="semibold" style={emptyTextStyle}>
+            <Text key="text-empty" weight="semibold" className="empty-text">
               Once you have a task, you'll find it here
             </Text>
           </div>
@@ -114,52 +110,67 @@ export class Task extends Widget<ITaskState> {
     );
   }
 
-  footerContent(): JSX.Element | undefined {
-    if (!this.state.data?.loading && this.state.data?.tasks?.length !== 0) {
-      return (
-        <Button
-          appearance="transparent"
-          icon={<ArrowRight16Filled />}
-          iconPosition="after"
-          size="small"
-          style={footerBtnStyle}
-          onClick={() =>
-            window.open(
-              "https://teams.microsoft.com/l/app/0d5c91ee-5be2-4b79-81ed-23e6c4580427?source=app-details-dialog",
-              "_blank"
-            )
-          } // navigate to detailed page
-        >
-          View all
-        </Button>
-      );
-    } else {
-      return undefined;
-    }
+  protected footerContent(): JSX.Element | undefined {
+    return this.state.tasks?.length !== 0 ? (
+      <Button
+        appearance="transparent"
+        icon={<ArrowRight16Filled />}
+        iconPosition="after"
+        size="small"
+        className={widgetStyle.footerBtn}
+        onClick={() => window.open("https://to-do.office.com/tasks/", "_blank")} // navigate to detailed page
+      >
+        View all
+      </Button>
+    ) : undefined;
+  }
+
+  protected loadingContent(): JSX.Element | undefined {
+    return (
+      <div style={{ display: "grid" }}>
+        <Spinner label="Loading..." labelPosition="below" />
+      </div>
+    );
+  }
+
+  async componentDidMount() {
+    super.componentDidMount();
+    document.addEventListener("mousedown", this.handleClickOutside);
+  }
+
+  componentWillUnmount(): void {
+    document.removeEventListener("mousedown", this.handleClickOutside);
   }
 
   private inputLayout(themeString: string): JSX.Element | undefined {
     return (
       <div
         ref={this.inputDivRef}
-        style={addTaskContainer(themeString, this.state.data?.inputFocused)}
+        className={mergeStyles(
+          "add-task-container",
+          this.state.inputFocused ? "focused-color" : "non-focused-color",
+          themeString === "contrast" ? "border-style" : ""
+        )}
       >
-        {this.state.data?.inputFocused ? (
-          <Circle20Regular style={addBtnStyle} />
+        {this.state.inputFocused ? (
+          <Circle20Regular className="add-btn" />
         ) : (
-          <Add20Filled style={addBtnStyle} />
+          <Add20Filled className="add-btn" />
         )}
 
         <input
           ref={this.inputRef}
           type="text"
-          style={inputStyle(this.state.data?.inputFocused)}
+          className={mergeStyles(
+            "input",
+            this.state.inputFocused ? "focused-color" : "non-focused-color"
+          )}
           onFocus={() => this.inputFocusedState()}
           placeholder="Add a task"
         />
-        {this.state.data?.inputFocused && (
+        {this.state.inputFocused && (
           <button
-            style={addTaskBtnStyle(this.state.data?.addBtnOver)}
+            className={this.state.addBtnOver ? "add-btn-enter" : "add-btn-leave"}
             onClick={() => {
               this.onAddButtonClick();
             }}
@@ -173,28 +184,13 @@ export class Task extends Widget<ITaskState> {
     );
   }
 
-  customiseWidgetStyle(): CSSProperties | undefined {
-    return widgetPaddingStyle;
-  }
-
-  async componentDidMount() {
-    super.componentDidMount();
-    document.addEventListener("mousedown", this.handleClickOutside);
-  }
-
-  componentWillUnmount(): void {
-    document.removeEventListener("mousedown", this.handleClickOutside);
-  }
-
   private handleClickOutside(event: any) {
     if (!this.inputDivRef.current?.contains(event.target)) {
       this.setState({
-        data: {
-          tasks: this.state.data?.tasks,
-          inputFocused: false,
-          addBtnOver: this.state.data?.addBtnOver,
-          loading: false,
-        },
+        tasks: this.state.tasks,
+        inputFocused: false,
+        addBtnOver: this.state.addBtnOver,
+        loading: false,
       });
     }
   }
@@ -203,12 +199,10 @@ export class Task extends Widget<ITaskState> {
     if (this.inputRef.current && this.inputRef.current.value.length > 0) {
       const tasks: TaskModel[] = await addTask(this.inputRef.current.value);
       this.setState({
-        data: {
-          tasks: tasks,
-          inputFocused: false,
-          addBtnOver: false,
-          loading: false,
-        },
+        tasks: tasks,
+        inputFocused: false,
+        addBtnOver: false,
+        loading: false,
       });
       this.inputRef.current.value = "";
       callFunction(this.inputRef.current.value);
@@ -217,34 +211,28 @@ export class Task extends Widget<ITaskState> {
 
   private inputFocusedState = () => {
     this.setState({
-      data: {
-        tasks: this.state.data?.tasks,
-        inputFocused: true,
-        addBtnOver: this.state.data?.addBtnOver,
-        loading: false,
-      },
+      tasks: this.state.tasks,
+      inputFocused: true,
+      addBtnOver: this.state.addBtnOver,
+      loading: false,
     });
   };
 
   private mouseEnterState = () => {
     this.setState({
-      data: {
-        tasks: this.state.data?.tasks,
-        inputFocused: this.state.data?.inputFocused,
-        addBtnOver: true,
-        loading: false,
-      },
+      tasks: this.state.tasks,
+      inputFocused: this.state.inputFocused,
+      addBtnOver: true,
+      loading: false,
     });
   };
 
   private mouseLeaveState = () => {
     this.setState({
-      data: {
-        tasks: this.state.data?.tasks,
-        inputFocused: this.state.data?.inputFocused,
-        addBtnOver: false,
-        loading: false,
-      },
+      tasks: this.state.tasks,
+      inputFocused: this.state.inputFocused,
+      addBtnOver: false,
+      loading: false,
     });
   };
 }

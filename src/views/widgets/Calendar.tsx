@@ -1,7 +1,9 @@
-import moment from "moment-timezone";
-import { CSSProperties } from "react";
+import "../styles/Calendar.css";
+import "../styles/Common.css";
 
-import { Button, Image, Text } from "@fluentui/react-components";
+import moment from "moment-timezone";
+
+import { Button, Image, Spinner, Text } from "@fluentui/react-components";
 import {
   ArrowRight16Filled,
   CalendarLtr24Regular,
@@ -12,85 +14,60 @@ import { extractTime } from "../../common/dateUtils";
 import { CalendarModel } from "../../models/calendarModel";
 import { getCalendar } from "../../services/calendarService";
 import { Widget } from "../lib/Widget";
-import { footerBtnStyle, headerContentStyle, headerTextStyle } from "../lib/Widget.styles";
-import {
-  bodyLayout,
-  divider,
-  meetingActionBtn,
-  meetingItemLayout,
-  meetingLayout,
-  meetingLocation,
-  meetingSummary,
-  meetingTime,
-  meetingTitle,
-  todayLayout,
-  todayText,
-  widgetStyle,
-} from "../styles/Calendar.styles";
-import {
-  emptyImgStyle,
-  emptyLayout,
-  emptyTextStyle,
-} from "../styles/Common.styles";
+import { widgetStyle } from "../lib/Widget.styles";
 
 interface ICalendarState {
   meetings?: CalendarModel[];
-  loading: boolean;
 }
 
 export class Calendar extends Widget<ICalendarState> {
-  async getData(): Promise<ICalendarState> {
-    return { meetings: await getCalendar(), loading: false };
+  protected async getData(): Promise<ICalendarState> {
+    return { meetings: await getCalendar() };
   }
 
-  headerContent(): JSX.Element | undefined {
+  protected headerContent(): JSX.Element | undefined {
     return (
-      <div style={headerContentStyle}>
+      <div className={widgetStyle.headerContent}>
         <CalendarLtr24Regular />
-        <Text style={headerTextStyle}>Your upcoming events</Text>
+        <Text className={widgetStyle.headerText}>Your upcoming events</Text>
         <Button icon={<MoreHorizontal32Regular />} appearance="transparent" />
       </div>
     );
   }
 
-  bodyContent(): JSX.Element | undefined {
-    const loading: boolean = !this.state.data || (this.state.data.loading ?? true);
-    const hasMeeting = this.state.data?.meetings?.length !== 0;
+  protected bodyContent(): JSX.Element | undefined {
+    const hasMeeting = this.state.meetings?.length !== 0;
     return (
-      <div style={bodyLayout(hasMeeting)}>
-        {loading ? (
-          <></>
-        ) : hasMeeting ? (
+      <div className={hasMeeting ? "has-meeting-layout" : "no-meeting-layout"}>
+        {hasMeeting ? (
           <>
-            <div style={todayLayout}>
-              <Text style={todayText}>{moment().format("ll")}</Text>
-              <Text style={meetingSummary}>
-                {`You have ${
-                  this.state.data?.meetings?.length ?? 0
-                } meetings today. The upcoming events`}
+            <div className="today-layout">
+              <Text className="today-text">{moment().format("ll")}</Text>
+              <Text className="meeting-summary">
+                {`You have ${this.state.meetings?.length ?? 0} meetings today. The upcoming events`}
               </Text>
             </div>
 
-            {this.state.data?.meetings?.map((item: CalendarModel, index) => {
+            {this.state.meetings?.map((item: CalendarModel, index) => {
               return (
-                <div key="div-meeting-item" style={meetingItemLayout}>
-                  <div key="div-divider" style={divider} />
-                  <div key="div-meeting-content" style={meetingLayout}>
-                    <Text key="text-meeting-title" style={meetingTitle}>
+                <div key="div-meeting-item" className="meeting-item-layout">
+                  <div key="div-divider" className="meeting-divider" />
+                  <div key="div-meeting-content" className="meeting-content-layout">
+                    <Text key="text-meeting-title" className="meeting-title">
                       {item.title}
                     </Text>
-                    <Text key="text-meeting-time" style={meetingTime}>
+                    <Text key="text-meeting-time" className="meeting-time">
                       {this.getMeetingTime(item)}
                     </Text>
-                    <Text key="text-meeting-loc" style={meetingLocation}>
+                    <Text key="text-meeting-loc" className="meeting-location">
                       {item.location}
                     </Text>
                   </div>
                   <Button
                     key="bt-meeting-action"
+                    className="meeting-action-btn"
                     appearance={index === 0 ? "primary" : "secondary"}
                     onClick={() => window.open(item.url)}
-                    style={meetingActionBtn}
                   >
                     {index === 0 ? "Join" : "Chat"}
                   </Button>
@@ -99,9 +76,9 @@ export class Calendar extends Widget<ICalendarState> {
             })}
           </>
         ) : (
-          <div style={emptyLayout}>
-            <Image src={`no-meeting.svg`} style={emptyImgStyle} />
-            <Text weight="semibold" style={emptyTextStyle}>
+          <div className="empty-layout">
+            <Image src={`no-meeting.svg`} className="empty-img" />
+            <Text weight="semibold" className="empty-text">
               No meeting today
             </Text>
           </div>
@@ -110,14 +87,14 @@ export class Calendar extends Widget<ICalendarState> {
     );
   }
 
-  footerContent(): JSX.Element | undefined {
+  protected footerContent(): JSX.Element | undefined {
     return (
       <Button
         appearance="transparent"
         icon={<ArrowRight16Filled />}
         iconPosition="after"
         size="small"
-        style={footerBtnStyle}
+        className={widgetStyle.footerBtn}
         onClick={() => window.open("https://outlook.office.com/calendar/view/day")}
       >
         View calendar
@@ -125,8 +102,12 @@ export class Calendar extends Widget<ICalendarState> {
     );
   }
 
-  customiseWidgetStyle(): CSSProperties | undefined {
-    return widgetStyle;
+  protected loadingContent(): JSX.Element | undefined {
+    return (
+      <div style={{ display: "grid" }}>
+        <Spinner label="Loading..." labelPosition="below" />
+      </div>
+    );
   }
 
   private getMeetingTime = (item: CalendarModel) => {

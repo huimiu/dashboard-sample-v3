@@ -1,4 +1,4 @@
-import { CSSProperties } from "react";
+import "../styles/Collaboration.css";
 
 import { Button, Image, Text } from "@fluentui/react-components";
 import {
@@ -11,91 +11,73 @@ import {
 import { CollaborationModel } from "../../models/collaborationModel";
 import { getCollaborationData } from "../../services/collaborationService";
 import { Widget } from "../lib/Widget";
-import { footerBtnStyle, headerStyleWithoutIcon, headerTextStyle } from "../lib/Widget.styles";
-import {
-  bodyContent,
-  bodyLayout,
-  colorNeutralForeground3,
-  descriptionStyle,
-  footerLayout,
-  gridDisplay,
-  shareBtnStyle,
-  titleStyle,
-} from "../styles/Collaboration.styles";
-import { widgetPaddingStyle } from "../styles/Common.styles";
+import { widgetStyle } from "../lib/Widget.styles";
 
-export class Collaboration extends Widget<CollaborationModel[]> {
-  async getData(): Promise<CollaborationModel[]> {
-    return getCollaborationData();
+interface ICollaborationState {
+  data: CollaborationModel[];
+}
+
+export class Collaboration extends Widget<ICollaborationState> {
+  async getData(): Promise<ICollaborationState> {
+    return { data: getCollaborationData() };
   }
 
-  headerContent(): JSX.Element | undefined {
+  protected headerContent(): JSX.Element | undefined {
     return (
-      <div style={headerStyleWithoutIcon}>
-        <Text style={headerTextStyle}>Team collaborations</Text>
+      <div className={widgetStyle.headerWithoutIcon}>
+        <Text className={widgetStyle.headerText}>Team collaborations</Text>
         <Button icon={<MoreHorizontal32Regular />} appearance="transparent" />
       </div>
     );
   }
 
-  bodyContent(): JSX.Element | undefined {
+  protected bodyContent(): JSX.Element | undefined {
     return (
-      <div style={bodyLayout}>
-        <div style={bodyContent}>
-          {this.state.data?.map((item: CollaborationModel) => {
-            return (
-              <div key={`collaboration-container-${item.id}`} style={gridDisplay}>
-                <Image
-                  key={`collaboration-img-${item.id}`}
-                  src={item.img}
-                  width="100%"
-                  shape="rounded"
+      <div className="colla-body-layout">
+        {this.state.data?.map((item: CollaborationModel) => {
+          return (
+            <div key={`colla-container-${item.id}`} className="collo-display">
+              <Image key={`colla-img-${item.id}`} src={item.img} width="100%" shape="rounded" />
+              <Text key={`colla-title-${item.id}`} className="colla-title">
+                {item.title}
+              </Text>
+              <Text key={`colla-description-${item.id}`} className="colla-description">
+                {item.description}
+              </Text>
+              <div key={`colla-footer-${item.id}`} className="footer-layout">
+                <Button
+                  key={`colla-share-${item.id}`}
+                  icon={<Share20Regular />}
+                  appearance="transparent"
+                  className="share-btn"
                 />
-                <Text key={`collaboration-title-${item.id}`} style={titleStyle}>
-                  {item.title}
+                <CircleSmall20Filled
+                  key={`colla-circle-${item.id}`}
+                  className="colorNeutralForeground3"
+                />
+                <Text key={`colla-time-${item.id}`} className="colorNeutralForeground3">
+                  {item.updateTime}
                 </Text>
-                <Text key={`collaboration-description-${item.id}`} style={descriptionStyle}>
-                  {item.description}
-                </Text>
-                <div key={`collaboration-footer-${item.id}`} style={footerLayout}>
-                  <Button
-                    key={`collaboration-share-${item.id}`}
-                    icon={<Share20Regular />}
-                    appearance="transparent"
-                    style={shareBtnStyle}
-                  />
-                  <CircleSmall20Filled
-                    key={`collaboration-circle-${item.id}`}
-                    style={colorNeutralForeground3}
-                  />
-                  <Text key={`collaboration-time-${item.id}`} style={colorNeutralForeground3}>
-                    {item.updateTime}
-                  </Text>
-                </div>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
     );
   }
 
-  footerContent(): JSX.Element | undefined {
+  protected footerContent(): JSX.Element | undefined {
     return (
       <Button
         appearance="transparent"
         icon={<ArrowRight16Filled />}
         iconPosition="after"
         size="small"
-        style={footerBtnStyle}
+        className={widgetStyle.footerBtn}
         onClick={() => {}} // navigate to detailed page
       >
         View all
       </Button>
     );
-  }
-
-  customiseWidgetStyle(): CSSProperties | undefined {
-    return widgetPaddingStyle;
   }
 }

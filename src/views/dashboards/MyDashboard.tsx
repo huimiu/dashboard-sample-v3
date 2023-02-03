@@ -1,19 +1,18 @@
+import "../styles/MyDashboard.css";
+
 import { CSSProperties } from "react";
 
 import { Image, Spinner } from "@fluentui/react-components";
 
 import { loginAction } from "../../internal/login";
-import { FxContext } from "../../internal/singletonContext";
+import { TeamsUserCredentialContext } from "../../internal/singletonContext";
 import { Dashboard } from "../lib/Dashboard";
 import { oneColumn } from "../lib/Dashboard.styles";
-import { imgStyle } from "../styles/MyDashboard.styles";
 import { Calendar } from "../widgets/Calendar";
 import { Chart } from "../widgets/Chart";
 import { Collaboration } from "../widgets/Collaboration";
 import { Documents } from "../widgets/Document";
 import { Task } from "../widgets/Task";
-import { Providers, ProviderState } from "@microsoft/mgt-element";
-import { TeamsFxProvider } from "@microsoft/mgt-teamsfx-provider";
 
 const scope = ["Files.Read", "Tasks.ReadWrite", "Calendars.Read"];
 
@@ -23,7 +22,7 @@ export default class MyDashboard extends Dashboard {
       <>
         {this.state.showLogin === false ? (
           <>
-            <Image style={imgStyle} src="bg.png" />
+            <Image className="img-style" src="bg.png" />
             <Chart />
             <div style={oneColumn()}>
               <Calendar />
@@ -54,8 +53,10 @@ export default class MyDashboard extends Dashboard {
 
   async componentDidMount() {
     super.componentDidMount();
-    await this.initGraphToolkit();
-    await this.initConsent();
+    if (await this.checkIsConsentNeeded()) {
+      await loginAction(scope);
+    }
+    this.setState({ showLogin: false });
   }
 
   protected customiseDashboardStyle(): CSSProperties | undefined {
@@ -69,27 +70,13 @@ export default class MyDashboard extends Dashboard {
         };
   }
 
-  async initGraphToolkit() {
-    const provider = new TeamsFxProvider(FxContext.getInstance().getTeamsFx(), scope);
-    Providers.globalProvider = provider;
-  }
-
-  async initConsent() {
-    let consentNeeded = await this.checkIsConsentNeeded();
-    if (consentNeeded) {
-      await loginAction(scope);
-    }
-    this.setState({ showLogin: false });
-    Providers.globalProvider.setState(ProviderState.SignedIn);
-  }
-
   async checkIsConsentNeeded() {
-    let consentNeeded = false;
+    let needConsent = false;
     try {
-      await FxContext.getInstance().getTeamsFx().getCredential().getToken(scope);
+      await TeamsUserCredentialContext.getInstance().getCredential().getToken(scope);
     } catch (error) {
-      consentNeeded = true;
+      needConsent = true;
     }
-    return consentNeeded;
+    return needConsent;
   }
 }

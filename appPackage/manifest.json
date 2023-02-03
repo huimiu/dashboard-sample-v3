@@ -15,12 +15,12 @@
         "outline": "outline.png"
     },
     "name": {
-        "short": "${{TEAMS_APP_NAME}}",
-        "full": "Full name for dashboard-sample-v3"
+        "short": "team-central-dashboard-${{TEAMSFX_ENV}}",
+        "full": "Full name for team-central-dashboard"
     },
     "description": {
-        "short": "Short description of dashboard-sample-v3",
-        "full": "Full description of dashboard-sample-v3"
+        "short": "Short description of team-central-dashboard",
+        "full": "Full description of team-central-dashboard"
     },
     "accentColor": "#FFFFFF",
     "bots": [],

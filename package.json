@@ -1,5 +1,5 @@
 {
-    "name": "dashboard-sample-v3",
+    "name": "team-central-dashboard",
     "version": "0.1.0",
     "engines": {
         "node": ">=14 <=16"
