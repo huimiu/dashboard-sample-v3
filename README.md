@@ -106,7 +106,8 @@ Once deployed, you may want to distribute your application to your organization'
 
 ### Code structure
 
-- You can check app configuration and environment information in: [teamsfx](teamsfx)
+- You can check app configuration in `teamsapp.*.yml` files
+- You can check app environment information in: [env](env)
 - You will find frontend code in: [src](src)
 - You will find backend code in: [api/finishTaskNotification](api/finishTaskNotification)
 
