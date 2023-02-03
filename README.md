@@ -19,6 +19,7 @@ Team Central Dashboard shows you how to build a tab with data chats and content 
 
 ## What you will learn in this sample:
 
+- How to use TeamsFx to embed a canvas containing multiple cards that provide an overview of data or content in your tab app.
 - How to use TeamsFx to build frontend hosting on Azure for your tab app.
 - How to use TeamsFx to build backend hosting on Azure for your tab app.
 - How to use MS graph client in TeamsFx to get access to M365 data.
