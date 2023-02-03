@@ -9,7 +9,7 @@ Microsoft Teams supports the ability to run web-based UI inside "custom tabs" th
 
 Team Central Dashboard shows you how to build a tab with data chats and content from Microsoft Graph to accelerate team collaboration and personal productivity.
 
-<img src="public\dashboard.png">
+![team-central-dashboard](images/team-central-dashboard.gif)
 
 ## Prerequisites
 
